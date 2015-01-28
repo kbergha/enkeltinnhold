@@ -25,11 +25,13 @@ try {
     exit("whoops, couldn't connect to the redis instance!");
 }
 
+/*
 echo "<pre>\n";
 //var_dump($client);
 
 $client->incr("en-fin-n0kkel");
 var_dump($client->get('en-fin-n0kkel'));
+
 
 $client->hmset("testArray", array(
         "brand" => "Toyota",
@@ -41,5 +43,6 @@ $client->hmset("testArray", array(
 $client->hset("testArray", "year of fabrication", date("Y"));
 
 var_dump($client->hgetall('testArray'));
-echo "</pre>\n";
 
+echo "</pre>\n";
+*/
