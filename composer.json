@@ -1,0 +1,7 @@
+{
+  "require": {
+    "predis/predis": "v1.0.1",
+    "mandrill/mandrill": "1.0.54",
+    "ircmaxell/password-compat": "v1.0.4"
+  }
+}
