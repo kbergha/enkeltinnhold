@@ -60,7 +60,7 @@ if(!isset($siteConfig['masterKey']) || mb_strlen($siteConfig['masterKey']) < 3) 
 /*
  * Resolve current Page
  * */
-$page = new \Enkeltinnhold\Page\Page();
+$page = new \Enkeltinnhold\Page();
 if(!$page->resolvePage()) {
     // 404
     $page->sendHeaders(404);
