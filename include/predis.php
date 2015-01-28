@@ -1,16 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: knuterik
- * Date: 23.02.14
- * Time: 14:04
- */
-
 
 // http://www.sitepoint.com/an-introduction-to-redis-in-php-using-predis/
 
+global $predisClient;
 
-$client = new Predis\Client([
+$predisClient = new Predis\Client([
     'scheme' => 'tcp',
     'host'   => '127.0.0.1',
     'port'   => 6379,
@@ -18,7 +12,7 @@ $client = new Predis\Client([
 
 
 try {
-    $client->connect();
+    $predisClient->connect();
 } catch (PredisNetworkConnectionException $exception) {
 // do stuff to handle the fact that you weren't able to connect to the server
 // here I'm using exit() just as a quick example...
