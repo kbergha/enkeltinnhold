@@ -5,4 +5,13 @@
 
 h1 {
     font-family: 'Orbitron', Verdana, sans-serif;
+    font-size: 40px;
+}
+
+p {
+    margin: 0 0 16px;
+}
+
+.container.main {
+    margin: 50px auto 0 auto;
 }

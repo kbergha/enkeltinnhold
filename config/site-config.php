@@ -7,3 +7,6 @@ $siteConfig['masterKey'] = '47brygg'; // Unique per site
 
 // Google Webfonts
 $siteConfig['googleWebFont'] = array('Armata::latin', 'Orbitron:700:latin');
+
+// Names
+$siteConfig['name'] = '47 Brygg';

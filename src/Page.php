@@ -29,6 +29,10 @@ class Page extends Enkeltinnhold\Base {
         //debug($this->getRedisClient()->hset($this->getMasterKey(), $pageKey, "TEST")); // returnerer false hvis field allerede fantes...
         //debug($this->getRedisClient()->hset($this->getMasterKey(), 'page:reserved:404', "<h1>4-oh-noes-4!</h1>")); // returnerer false hvis field allerede fantes...
 
+        // 47brygg:page:1
+        // 47brygg:page:reserved:404 pageData
+        // må bygge opp et "set" med page keys.
+
         $pageData = $this->getRedisClient()->hget($this->getMasterKey(), $pageKey);
 
         if($pageData !== NULL) {
@@ -48,6 +52,7 @@ class Page extends Enkeltinnhold\Base {
 
     public function sendHeaders($httpCode = false) {
         // Default to false, let nginx handle.
+
         header("Cache-Control: no-cache, must-revalidate", true); // HTTP/1.1
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT", true); // Date in the past
 
