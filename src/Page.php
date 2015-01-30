@@ -33,6 +33,12 @@ class Page extends Enkeltinnhold\Base {
         // 47brygg:page:reserved:404 pageData
         // må bygge opp et "set" med page keys.
 
+        // @todo: Lese om sets og scan.
+
+        //$this->getRedisClient()->hset('47brygg:page:reserved:404', 'pageData', '<html>')
+        //$this->getRedisClient()->hset('47brygg:page:1')
+        // http://stackoverflow.com/questions/19910527/how-to-use-hscan-command-in-redis svar 2
+
         $pageData = $this->getRedisClient()->hget($this->getMasterKey(), $pageKey);
 
         if($pageData !== NULL) {
