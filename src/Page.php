@@ -5,23 +5,25 @@ namespace Enkeltinnhold;
 use Enkeltinnhold;
 
 class Page extends Enkeltinnhold\Base {
-    protected $resolved = false;
-    protected $pageKeyPrefix = 'page:';
-    protected $pageData;
+    private $resolved = false;
+    private $pageKeyPrefix = 'page:';
+    private $pageData;
 
     public function resolvePage() {
         $request = trim(strip_tags($_SERVER['QUERY_STRING']));
         $pageKey = false;
 
+        $predisClient = $this->getPredisClient();
+
         if(mb_strlen($request) == 0) {
             // Index
-            $pageKey = $this->pageKeyPrefix.'index';
+            $pageKey = $this->getMasterKey().':'.$this->pageKeyPrefix.'reserved:index';
         } else {
             $request = explode('/', $request);
             if(is_array($request)) {
                 $request = explode('=', $request[0]);
                 if(isset($request[1])) {
-                    $pageKey = $this->pageKeyPrefix.$request[1];
+                    $pageKey = $this->getMasterKey().':'.$this->pageKeyPrefix.$request[1];
                 }
             }
         }
@@ -35,25 +37,29 @@ class Page extends Enkeltinnhold\Base {
 
         // @todo: Lese om sets og scan.
 
-        //$this->getRedisClient()->hset('47brygg:page:reserved:404', 'pageData', '<html>')
-        //$this->getRedisClient()->hset('47brygg:page:1')
+        //$predisClient->hset('47brygg:page:reserved:404', 'pageData', '<h1>4-oh-noes-4!</h1>');
+        //debug($predisClient->hset('47brygg:page:2', 'pageData', "<h1>#2 - Lucky Jack</h1><p>Malt, humle og kjærlighet</p>"));
+
         // http://stackoverflow.com/questions/19910527/how-to-use-hscan-command-in-redis svar 2
+        $this->pageData = $predisClient->hget($pageKey, "pageData");
 
-        $pageData = $this->getRedisClient()->hget($this->getMasterKey(), $pageKey);
-
-        if($pageData !== NULL) {
+        if($this->pageData !== NULL) {
             $this->resolved = true;
         } else {
             $this->resolved = false;
-            $pageKey = $this->pageKeyPrefix.'reserved:404';
-            $pageData = $this->getRedisClient()->hget($this->getMasterKey(), $pageKey);
+            $pageKey = $this->getMasterKey().':'.$this->pageKeyPrefix.'reserved:404';
+            $this->pageData = $predisClient->hget($pageKey, "pageData");
         }
-        $this->pageData = $pageData;
+
         return $this->resolved;
     }
 
     public function getPageData() {
         return $this->pageData; // @todo: masse greier - dele opp, legge til element for element i admin.
+    }
+
+    public function isResolved() {
+        return $this->resolved;
     }
 
     public function sendHeaders($httpCode = false) {

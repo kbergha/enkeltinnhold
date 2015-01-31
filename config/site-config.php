@@ -10,3 +10,8 @@ $siteConfig['googleWebFont'] = array('Armata::latin', 'Orbitron:700:latin');
 
 // Names
 $siteConfig['name'] = '47 Brygg';
+
+
+// Date and time
+$siteConfig['dateFormat'] = 'd.m.Y';
+$siteConfig['timeFormat'] = 'h:i';

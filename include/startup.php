@@ -6,8 +6,6 @@
 require_once '../config/site-config.php';
 require_once '../vendor/autoload.php';
 require_once '../vendor/ircmaxell/password-compat/lib/password.php';
-require_once 'session.php';
-require_once 'predis.php';
 require_once 'functions.php';
 
 // Register autoloader. Example from http://www.php-fig.org/psr/psr-4/examples/
@@ -53,6 +51,11 @@ spl_autoload_register(function ($class) {
     }
 });
 
+
+require_once 'session.php';
+require_once 'predis.php';
+
+
 if(!isset($siteConfig['masterKey']) || mb_strlen($siteConfig['masterKey']) < 3) {
     die('Missing or wrong master key!');
 }
@@ -60,7 +63,10 @@ if(!isset($siteConfig['masterKey']) || mb_strlen($siteConfig['masterKey']) < 3) 
 /*
  * Resolve current Page
  * */
+
+global $page;
 $page = new \Enkeltinnhold\Page();
+
 if(!$page->resolvePage()) {
     // 404
     $page->sendHeaders(404);
