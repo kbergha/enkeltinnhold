@@ -3,10 +3,11 @@
  * Beep, beep, initializing boot up sequence, beep. *
  * */
 
-require_once '../config/site-config.php';
-require_once '../vendor/autoload.php';
-require_once '../vendor/ircmaxell/password-compat/lib/password.php';
-require_once 'functions.php';
+
+require_once __DIR__.'/../config/site-config.php';
+require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/ircmaxell/password-compat/lib/password.php';
+require_once __DIR__.'/functions.php';
 
 // Register autoloader. Example from http://www.php-fig.org/psr/psr-4/examples/
 /**

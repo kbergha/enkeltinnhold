@@ -10,7 +10,7 @@ class Base {
         $this->masterKey = $siteConfig['masterKey'];
     }
 
-    protected function getMasterKey() {
+    public function getMasterKey() {
         return $this->masterKey;
     }
 

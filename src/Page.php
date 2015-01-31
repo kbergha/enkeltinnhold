@@ -2,9 +2,8 @@
 
 
 namespace Enkeltinnhold;
-use Enkeltinnhold;
 
-class Page extends Enkeltinnhold\Base {
+class Page extends Base {
     private $resolved = false;
     private $pageKeyPrefix = 'page:';
     private $pageData;
@@ -27,6 +26,17 @@ class Page extends Enkeltinnhold\Base {
                 }
             }
         }
+
+
+        /*
+         *
+         * created
+         * updated
+         * title
+         *
+         *
+         * */
+
 
         // 47brygg:page:1
         // 47brygg:page:reserved:404 pageData
@@ -70,5 +80,34 @@ class Page extends Enkeltinnhold\Base {
                 //header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", false, 404); // @todo: nginx tar over 404...
                 break;
         }
+    }
+
+    public function getAllPageKeys() {
+        $predisClient = $this->getPredisClient();
+        $allPages = array();
+        $pages = $predisClient->smembers($this->getMasterKey().':allpages');
+        if(is_array($pages) && count($pages)) {
+            foreach($pages as $page) {
+                if(stripos($page, 'page:reserved:') === false) {
+                    $allPages[] = $page;
+                }
+            }
+        }
+        return $allPages;
+
+    }
+
+    public function getAllReservedPageKeys() {
+        $predisClient = $this->getPredisClient();
+        $allPages = array();
+        $pages = $predisClient->smembers($this->getMasterKey().':allpages');
+        if(is_array($pages) && count($pages)) {
+            foreach($pages as $page) {
+                if(stripos($page, 'page:reserved:') === 0) {
+                    $allPages[] = $page;
+                }
+            }
+        }
+        return $allPages;
     }
 }
