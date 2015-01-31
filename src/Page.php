@@ -17,38 +17,35 @@ class Page extends Enkeltinnhold\Base {
 
         if(mb_strlen($request) == 0) {
             // Index
-            $pageKey = $this->getMasterKey().':'.$this->pageKeyPrefix.'reserved:index';
+            $pageKey = $this->pageKeyPrefix.'reserved:index';
         } else {
             $request = explode('/', $request);
             if(is_array($request)) {
                 $request = explode('=', $request[0]);
                 if(isset($request[1])) {
-                    $pageKey = $this->getMasterKey().':'.$this->pageKeyPrefix.$request[1];
+                    $pageKey = $this->pageKeyPrefix.$request[1];
                 }
             }
         }
 
-        //debug($this->getRedisClient()->hset($this->getMasterKey(), $pageKey, "TEST")); // returnerer false hvis field allerede fantes...
-        //debug($this->getRedisClient()->hset($this->getMasterKey(), 'page:reserved:404', "<h1>4-oh-noes-4!</h1>")); // returnerer false hvis field allerede fantes...
-
         // 47brygg:page:1
         // 47brygg:page:reserved:404 pageData
-        // må bygge opp et "set" med page keys.
 
-        // @todo: Lese om sets og scan.
+        // http://stackoverflow.com/questions/19910527/how-to-use-hscan-command-in-redis svar 2
 
         //$predisClient->hset('47brygg:page:reserved:404', 'pageData', '<h1>4-oh-noes-4!</h1>');
         //debug($predisClient->hset('47brygg:page:2', 'pageData', "<h1>#2 - Lucky Jack</h1><p>Malt, humle og kjærlighet</p>"));
 
-        // http://stackoverflow.com/questions/19910527/how-to-use-hscan-command-in-redis svar 2
-        $this->pageData = $predisClient->hget($pageKey, "pageData");
+        //SADD 47brygg:allpages
+        //debug($predisClient->sadd('47brygg:allpages', array("page:1", "page:2", "page:reserved:index", "page:reserved:404")));
 
-        if($this->pageData !== NULL) {
+        // set is member
+        if($predisClient->sismember($this->getMasterKey().':allpages', $pageKey)) {
             $this->resolved = true;
+            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$pageKey, "pageData");
         } else {
-            $this->resolved = false;
-            $pageKey = $this->getMasterKey().':'.$this->pageKeyPrefix.'reserved:404';
-            $this->pageData = $predisClient->hget($pageKey, "pageData");
+            $pageKey = 'page:reserved:404';
+            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$pageKey, "pageData");
         }
 
         return $this->resolved;

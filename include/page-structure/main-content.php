@@ -25,5 +25,10 @@ debug($dateTime->format(DateTime::ISO8601));
 //$dateTime->format()
 */
 
+
+//sscan hashkeys 0 match my*
+//debug($predisClient->sscan('47brygg:allpages', 0));
+//debug($predisClient->sscan('47brygg:allpages', 0, array('match' => 'page:*')));
+//debug($predisClient->sscan('47brygg:allpages', 0, array('match' => 'page:reserved:*')));
 ?>
 </div>
