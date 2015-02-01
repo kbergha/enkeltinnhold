@@ -62,6 +62,18 @@ if($login->isLoggedIn() == false) {
     }
 
     if(isset($_GET['page']) && is_string($_GET['page'])) {
+
+        /*
+         * Brygget x.y - tappet xx.yy - settes kaldt +10 dager osv.
+        $timestamp = date('c'); //2015-01-31T14:30:22+01:00
+        $dateTime = DateTime::createFromFormat(DateTime::ISO8601, $timestamp);
+        debug($dateTime->format(DateTime::ISO8601));
+        $dti = new DateInterval('P2D'); // Period 2 days, Time, 2 hours. P4Y1M2DT1H2M3S, 4 years, 1 month, 2 days, 1 hour, 2 minutes, 3 seconds.
+        $dateTime->add($dti);
+        debug($dateTime->format(DateTime::ISO8601));
+        //$dateTime->format()
+        */
+
         $editPageKey = $_GET['page'];
         $allPageData = $predisClient->hgetall($page->getMasterKey().':'.$_GET['page']);
 

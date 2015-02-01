@@ -5,6 +5,7 @@ namespace Enkeltinnhold;
 
 class Page extends Base {
     private $resolved = false;
+    protected $loaded = false;
     private $pageKeyPrefix = 'page:';
 
     // Common page elements
@@ -79,6 +80,7 @@ class Page extends Base {
                         break;
                 }
             }
+            $this->loaded = true;
             return true;
         } else {
             return false;
@@ -107,12 +109,11 @@ class Page extends Base {
         // set is member
         if($predisClient->sismember($this->getMasterKey().':allpages', $this->pageKey)) {
             $this->resolved = true;
-            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$this->pageKey, "pageData");
+            $this->load();
         } else {
             $this->pageKey = 'page:reserved:404';
-            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$this->pageKey, "pageData");
+            $this->load();
         }
-
         return $this->resolved;
     }
 
@@ -122,6 +123,10 @@ class Page extends Base {
 
     public function isResolved() {
         return $this->resolved;
+    }
+
+    public function isLoaded() {
+        return $this->loaded;
     }
 
     public function sendHeaders($httpCode = false) {

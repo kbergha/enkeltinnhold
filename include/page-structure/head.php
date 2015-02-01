@@ -1,10 +1,24 @@
+<?php
+$base = new Enkeltinnhold\Base();
+$page = $base->getPage();
+$config = $base->getSiteConfig();
+
+$title = 'Enkelt innhold';
+if(isset($config['name']) && mb_strlen($config['name'])) {
+    $title = $config['name'];
+}
+
+if(!is_null($page->title) && mb_strlen($page->title)) {
+    $title = $page->title.' - '.$title;
+}
+?>
 <!DOCTYPE html>
 <html lang="no">
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Enkelt innhold</title>
+    <title><?php echo $title; ?></title>
     <meta name="description" content="">
     <!-- Bootstrap -->
     <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">

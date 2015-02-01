@@ -13,5 +13,5 @@ $siteConfig['name'] = '47 Brygg';
 
 
 // Date and time
-$siteConfig['dateFormat'] = 'd.m.Y';
+$siteConfig['dateFormat'] = 'd.m.y';
 $siteConfig['timeFormat'] = 'h:i';
