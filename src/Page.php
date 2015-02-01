@@ -6,56 +6,111 @@ namespace Enkeltinnhold;
 class Page extends Base {
     private $resolved = false;
     private $pageKeyPrefix = 'page:';
-    private $pageData;
+
+    // Common page elements
+    public $pageKey = null;
+    public $title = null;
+    public $created = null;
+    public $updated = null;
+    public $createdBy = null;
+    public $updatedBy = null;
+
+    protected $pageData; // @todo: masse greier - dele opp, legge til element for element i admin.
+
+    public function __construct($pageKey = null) {
+        parent::__construct();
+        $this->pageKey = $pageKey;
+    }
+
+    public function setPageData($pageData) {
+        $this->pageData = $pageData;
+    }
+
+    public function save() {
+        $predisClient = $this->getPredisClient();
+
+        $allData = array();
+        $allData['title'] = $this->title;
+        $allData['created'] = $this->created;
+        $allData['updated'] = $this->updated;
+        $allData['createdBy'] = $this->createdBy;
+        $allData['updatedBy'] = $this->updatedBy;
+        $allData['pageData'] = $this->pageData;
+
+        $status = $predisClient->hmset($this->getMasterKey().':'.$this->pageKey, $allData);
+
+        if(get_class($status) == 'Predis\Response\Status' && $status->getPayLoad() == 'OK') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function load() {
+        $predisClient = $this->getPredisClient();
+
+        // @todo: Also check if sismember
+
+        $allData = $predisClient->hgetall($this->getMasterKey().':'.$this->pageKey);
+
+        if(is_array($allData) && count($allData)) {
+            foreach ($allData as $property => $value) {
+                switch($property) {
+                    case 'title':
+                        $this->title = $value;
+                        break;
+                    case 'created':
+                        $this->created = $value;
+                        break;
+                    case 'updated':
+                        $this->updated = $value;
+                        break;
+                    case 'createdBy':
+                        $this->createdBy = $value;
+                        break;
+                    case 'updatedBy':
+                        $this->updatedBy = $value;
+                        break;
+                    case 'pageData':
+                        $this->pageData = $value;
+                        break;
+                    default:
+                        // Unknown, ignore and log?
+                        break;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+        unset($allData);
+    }
 
     public function resolvePage() {
         $request = trim(strip_tags($_SERVER['QUERY_STRING']));
-        $pageKey = false;
 
         $predisClient = $this->getPredisClient();
 
         if(mb_strlen($request) == 0) {
             // Index
-            $pageKey = $this->pageKeyPrefix.'reserved:index';
+            $this->pageKey = $this->pageKeyPrefix.'reserved:index';
         } else {
             $request = explode('/', $request);
             if(is_array($request)) {
                 $request = explode('=', $request[0]);
                 if(isset($request[1])) {
-                    $pageKey = $this->pageKeyPrefix.$request[1];
+                    $this->pageKey = $this->pageKeyPrefix.$request[1];
                 }
             }
         }
 
-
-        /*
-         *
-         * created
-         * updated
-         * title
-         *
-         *
-         * */
-
-
-        // 47brygg:page:1
-        // 47brygg:page:reserved:404 pageData
-
-        // http://stackoverflow.com/questions/19910527/how-to-use-hscan-command-in-redis svar 2
-
-        //$predisClient->hset('47brygg:page:reserved:404', 'pageData', '<h1>4-oh-noes-4!</h1>');
-        //debug($predisClient->hset('47brygg:page:2', 'pageData', "<h1>#2 - Lucky Jack</h1><p>Malt, humle og kjærlighet</p>"));
-
-        //SADD 47brygg:allpages
-        //debug($predisClient->sadd('47brygg:allpages', array("page:1", "page:2", "page:reserved:index", "page:reserved:404")));
-
         // set is member
-        if($predisClient->sismember($this->getMasterKey().':allpages', $pageKey)) {
+        if($predisClient->sismember($this->getMasterKey().':allpages', $this->pageKey)) {
             $this->resolved = true;
-            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$pageKey, "pageData");
+            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$this->pageKey, "pageData");
         } else {
-            $pageKey = 'page:reserved:404';
-            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$pageKey, "pageData");
+            $this->pageKey = 'page:reserved:404';
+            $this->pageData = $predisClient->hget($this->getMasterKey().':'.$this->pageKey, "pageData");
         }
 
         return $this->resolved;

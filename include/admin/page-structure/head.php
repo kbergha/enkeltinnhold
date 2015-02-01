@@ -8,8 +8,9 @@
     <meta name="description" content="">
     <!-- Bootstrap -->
     <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="/css/main.css" media="screen">
     <link rel="stylesheet" href="/css/vendor/trumbowyg/ui/trumbowyg.min.css" media="screen">
+    <link rel="stylesheet" href="/css/main.css" media="screen">
+    <link rel="stylesheet" href="/css/admin.css" media="screen">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -33,6 +34,7 @@
     }
     ?>
     <script src="/js/vendor/trumbowyg/trumbowyg.min.js"></script>
+    <script src="/js/admin.js"></script>
 </head>
 <body>
 <!-- Fixed navbar -->

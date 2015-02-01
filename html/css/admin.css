@@ -1,0 +1,62 @@
+.trumbowyg-box {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.btn:focus,.btn:active {
+    outline: none !important;
+}
+
+button.has-spinner .glyphicon-spin {
+    display: none;
+    margin-left: 0.5em;
+}
+
+button.has-spinner.spinning .glyphicon-spin {
+    display: inline-block;
+}
+
+button.has-spinner.spinning {
+    cursor: progress;
+}
+
+.glyphicon-spin {
+    -webkit-animation: spin 1500ms infinite linear;
+    animation: spin 1500ms infinite linear;
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+form.page-edit {
+
+}
+
+form.page-edit .glyphicon-ok-sign {
+    color: #00a900;
+    font-size: 26px;
+    margin-left: 8px;
+}
+
+form.page-edit .glyphicon-warning-sign {
+    color: red;
+    font-size: 26px;
+    margin-left: 8px;
+}

@@ -28,14 +28,20 @@ if($login->isLoggedIn() == false) {
     <h1>Kontrollpanel</h1>
     <?php
 
-    $page = new \Enkeltinnhold\Page();
+    $page = new \Enkeltinnhold\Page(); // @todo move to a "page manager" ?
 
     $allPages = $page->getAllPageKeys();
     if(is_array($allPages) && count($allPages)) {
         echo '<h2>Alle vanlige sider:</h2>';
         echo '<ol>';
         foreach($allPages as $pageKey) {
-            echo '<li><a href="/admin/index.php?page='.$pageKey.'"> '.$pageKey.'</a></li>';
+            $individualPage = new \Enkeltinnhold\Page($pageKey);
+            if($individualPage->load()) {
+                echo '<li><a href="/admin/index.php?page='.$pageKey.'"> '.$individualPage->title.' ('.$pageKey.')</a></li>';
+            } else {
+                echo '<li><a href="/admin/index.php?page='.$pageKey.'"> '.$pageKey.'</a></li>';
+            }
+
         }
         echo '</ol>';
     }
@@ -45,20 +51,90 @@ if($login->isLoggedIn() == false) {
         echo '<h2>Alle systemsider:</h2>';
         echo '<ol>';
         foreach($allReservedPages as $pageKey) {
-            echo '<li><a href="/admin/index.php?page='.$pageKey.'"> '.$pageKey.'</a></li>';
+            $individualPage = new \Enkeltinnhold\Page($pageKey);
+            if($individualPage->load()) {
+                echo '<li><a href="/admin/index.php?page='.$pageKey.'"> '.$individualPage->title.' ('.$pageKey.')</a></li>';
+            } else {
+                echo '<li><a href="/admin/index.php?page='.$pageKey.'"> '.$pageKey.'</a></li>';
+            }
         }
         echo '</ol>';
     }
 
     if(isset($_GET['page']) && is_string($_GET['page'])) {
+        $editPageKey = $_GET['page'];
         $allPageData = $predisClient->hgetall($page->getMasterKey().':'.$_GET['page']);
+
+        $title = '';
+        if(isset($allPageData['title'])) {
+            $title = $allPageData['title'];
+        }
+
+        $created = '';
+        if(isset($allPageData['created'])) {
+            $created = $allPageData['created'];
+        }
+
+        $createdBy = '';
+        if(isset($allPageData['createdBy'])) {
+            $createdBy = $allPageData['createdBy'];
+        }
+
+        $updated = '';
+        if(isset($allPageData['updated'])) {
+            $updated = $allPageData['updated'];
+        }
+
+        $updatedBy = '';
+        if(isset($allPageData['updatedBy'])) {
+            $updatedBy = $allPageData['updatedBy'];
+        }
+
+        $pageData = '';
+        if(isset($allPageData['pageData'])) {
+            $pageData = $allPageData['pageData'];
+        }
+
+        // @todo: validate and sanitize
 
         $uniqueID = uniqid("page-");
 
-        echo '<textarea id="'.$uniqueID.'">';
-        echo $allPageData['pageData'];
-        echo '</textarea>';
         ?>
+        <form class="form-horizontal page-edit">
+            <input type="hidden" name="pageKey" value="<?php echo $editPageKey; ?>">
+            <fieldset>
+                <div class="form-group">
+                    <label for="title" class="col-sm-2 control-label">Tittel</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="title" id="title" placeholder="Tittel" value="<?php echo $title; ?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="<?php echo $uniqueID; ?>" class="col-sm-2 control-label">Tekst</label>
+                    <div class="col-sm-10">
+                        <?php
+                        echo '<textarea name="pageData" id="'.$uniqueID.'">';
+                        echo $pageData;
+                        echo '</textarea>';
+                        ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Sist oppdatert</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static"><?php echo $updated; ?> av <?php echo $updatedBy; ?></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary btn-lg has-spinner" id="fjas">
+                            <span class="update">Lagre innhold</span>
+                            <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
         <script>
             $(document).ready(function() {
                 $('#<?php echo $uniqueID; ?>').trumbowyg({
@@ -72,6 +148,9 @@ if($login->isLoggedIn() == false) {
                     },
                     btns: ['viewHTML', '|', 'formattingLight', '|', 'bold', 'italic', '|', 'link', '|', 'unorderedList', 'orderedList']
                 });
+
+                // $('#editor').trumbowyg('html');
+
             });
         </script>
         <?php
