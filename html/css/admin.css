@@ -49,14 +49,24 @@ form.page-edit {
 
 }
 
+form.page-new-edit .glyphicon-ok-sign,
 form.page-edit .glyphicon-ok-sign {
     color: #00a900;
     font-size: 26px;
     margin-left: 8px;
 }
 
+form.page-new-edit .glyphicon-warning-sign,
 form.page-edit .glyphicon-warning-sign {
     color: red;
     font-size: 26px;
     margin-left: 8px;
+    clear: both;
+}
+
+p.bg-success,
+p.bg-danger {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
 }

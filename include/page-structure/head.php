@@ -68,6 +68,7 @@ if(!is_null($page->title) && mb_strlen($page->title)) {
                 ?>
                 <li class="<?php echo $class; ?>"><a href="/">Startsiden</a></li>
                 <?php
+                // @todo: order by
                 $allPages = $page->getAllPageKeys(0, 3);
                 if(is_array($allPages) && count($allPages)) {
                     echo '<li class=""><span>Siste sider:</span></li>';

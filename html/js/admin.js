@@ -9,7 +9,6 @@ $(document).ready(function() {
     $('form.page-edit').submit(function(e) {
         e.preventDefault();
         var form = $(this);
-
         var formData = form.serialize();
 
         form.find('button.has-spinner').addClass('spinning');
@@ -47,6 +46,69 @@ $(document).ready(function() {
                     setTimeout(function() {
                         $('#'+randomId).remove();
                     }, 20000);
+                }
+
+            })
+            .fail(function(data) {
+                alert( "error" );
+            });
+
+    });
+
+    $('form.page-new-edit').submit(function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var formData = form.serialize();
+
+        form.find('button.has-spinner').addClass('spinning');
+        form.find('button.has-spinner').addClass('disabled');
+        form.find('button.has-spinner span.update').html('Lagrer...');
+
+        form.find('textarea').each(function( index ) {
+            var textAreaId = $(this).attr('id');
+            if($('#' + textAreaId).trumbowyg('html') != false) {
+                $('#' + textAreaId).html($('#' + textAreaId).trumbowyg('html'));
+            }
+        });
+
+        //alert(formData);
+
+        $.get('/admin/save.php?action=newPage&' + formData , { '_': $.now() } , function() {}) // '_': $.now() = prevent caching
+            .done(function(data) {
+                var status = data.status;
+                var randomId = getRandomId('');
+                var randomIdMessage = getRandomId('');
+
+                form.find('button.has-spinner').removeClass('spinning');
+
+                if(status == 'saved') {
+                    //yay
+                    form.find('button.has-spinner span.update').html('Lagre innhold');
+                    form.find('button.has-spinner').after('<span id="'+ randomId +'" class="glyphicon glyphicon-ok-sign"></span>');
+                    form.find('button.has-spinner').after('<p id="'+ randomIdMessage +'" class="bg-success">'+ data.message +'</p>');
+
+                    setTimeout(function() {
+                        $('#'+randomId).remove();
+                        window.location.replace('/admin/index.php');
+                    }, 5000);
+                } else if(status == 'failed') {
+
+                    form.find('button.has-spinner span.update').html('Lagring feilet');
+                    form.find('button.has-spinner').removeClass('disabled');
+
+                    if(data.message) {
+                        form.find('button.has-spinner').after('<p id="'+ randomIdMessage +'" class="bg-danger">'+ data.message +'</p>');
+                    }
+
+                    if(data.element) {
+                        $('#'+data.element).parent().parent().addClass('has-error');
+                    }
+
+                    form.find('button.has-spinner').after('<span id="'+ randomId +'" class="glyphicon glyphicon-warning-sign"></span>');
+                    setTimeout(function() {
+                        $('#'+randomId).remove();
+                        $('#'+randomIdMessage).remove();
+                    }, 10000);
                 }
 
             })

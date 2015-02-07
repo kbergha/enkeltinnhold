@@ -59,7 +59,8 @@
             if($login->isLoggedIn()) {
                 ?>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="/admin/index.php?logout=true">Logget inn som <?php echo $login->getLoggedInUser(); ?>, logg ut</a></li>
+                    <li><span>Logget inn som <?php echo $login->getLoggedInUser(); ?>,</span></li>
+                    <li><a href="/admin/index.php?logout=true">logg ut</a></li>
                 </ul>
             <?php
             }
