@@ -82,19 +82,19 @@ if($login->isLoggedIn() == false) {
             $title = $allPageData['title'];
         }
 
-        $created = '';
-        if(isset($allPageData['created'])) {
-            $created = $allPageData['created'];
-        }
-
-        $createdBy = '';
-        if(isset($allPageData['createdBy'])) {
-            $createdBy = $allPageData['createdBy'];
+        $digest = '';
+        if(isset($allPageData['digest'])) {
+            $digest = $allPageData['digest'];
         }
 
         $updated = '';
         if(isset($allPageData['updated'])) {
             $updated = $allPageData['updated'];
+        }
+
+        $created = '';
+        if(isset($allPageData['created'])) {
+            $created = $allPageData['created'];
         }
 
         $updatedBy = '';
@@ -122,6 +122,12 @@ if($login->isLoggedIn() == false) {
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="digest" class="col-sm-2 control-label">Ingress</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="digest" id="digest" placeholder="Ingress" value="<?php echo $digest; ?>">
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="<?php echo $uniqueID; ?>" class="col-sm-2 control-label">Tekst</label>
                     <div class="col-sm-10">
                         <?php
@@ -129,6 +135,12 @@ if($login->isLoggedIn() == false) {
                         echo $pageData;
                         echo '</textarea>';
                         ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Opprettet</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static"><?php echo $created; ?></p>
                     </div>
                 </div>
                 <div class="form-group">

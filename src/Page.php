@@ -11,9 +11,9 @@ class Page extends Base {
     // Common page elements
     public $pageKey = null;
     public $title = null;
+    public $digest = null;
     public $created = null;
     public $updated = null;
-    public $createdBy = null;
     public $updatedBy = null;
 
     protected $pageData; // @todo: masse greier - dele opp, legge til element for element i admin.
@@ -32,12 +32,11 @@ class Page extends Base {
 
         $allData = array();
         $allData['title'] = $this->title;
+        $allData['digest'] = $this->digest;
         $allData['created'] = $this->created;
         $allData['updated'] = $this->updated;
-        $allData['createdBy'] = $this->createdBy;
         $allData['updatedBy'] = $this->updatedBy;
         $allData['pageData'] = $this->pageData;
-
         $status = $predisClient->hmset($this->getMasterKey().':'.$this->pageKey, $allData);
 
         if(get_class($status) == 'Predis\Response\Status' && $status->getPayLoad() == 'OK') {
@@ -47,7 +46,7 @@ class Page extends Base {
         }
     }
 
-    public function load() {
+    public function load($all = true) {
         $predisClient = $this->getPredisClient();
 
         // @todo: Also check if sismember
@@ -60,20 +59,22 @@ class Page extends Base {
                     case 'title':
                         $this->title = $value;
                         break;
+                    case 'digest':
+                        $this->digest = $value;
+                        break;
                     case 'created':
                         $this->created = $value;
                         break;
                     case 'updated':
                         $this->updated = $value;
                         break;
-                    case 'createdBy':
-                        $this->createdBy = $value;
-                        break;
                     case 'updatedBy':
                         $this->updatedBy = $value;
                         break;
                     case 'pageData':
-                        $this->pageData = $value;
+                        if($all == true) {
+                            $this->pageData = $value;
+                        }
                         break;
                     default:
                         // Unknown, ignore and log?
@@ -129,6 +130,14 @@ class Page extends Base {
         return $this->loaded;
     }
 
+    public function isActive() {
+        $activePage = $this->getPage();
+        if($activePage->pageKey == $this->pageKey) {
+            return true;
+        }
+        return false;
+    }
+
     public function sendHeaders($httpCode = false) {
         // Default to false, let nginx handle.
 
@@ -142,22 +151,23 @@ class Page extends Base {
         }
     }
 
-    public function getAllPageKeys() {
+    public function getAllPageKeys($offset = 0, $limit = 5) {
         $predisClient = $this->getPredisClient();
         $allPages = array();
         $pages = $predisClient->smembers($this->getMasterKey().':allpages');
         if(is_array($pages) && count($pages)) {
             foreach($pages as $page) {
-                if(stripos($page, 'page:reserved:') === false) {
+                if (stripos($page, 'page:reserved:') === false) {
                     $allPages[] = $page;
                 }
             }
+            $allPages = array_slice($allPages, $offset, $limit, true);
         }
         return $allPages;
 
     }
 
-    public function getAllReservedPageKeys() {
+    public function getAllReservedPageKeys($offset = 0, $limit = 10) {
         $predisClient = $this->getPredisClient();
         $allPages = array();
         $pages = $predisClient->smembers($this->getMasterKey().':allpages');
@@ -167,7 +177,17 @@ class Page extends Base {
                     $allPages[] = $page;
                 }
             }
+            $allPages = array_slice($allPages, $offset, $limit, true);
         }
         return $allPages;
     }
+
+    public function getURL() {
+        $parts = (explode('page:', $this->pageKey));
+        if(isset($parts[1])) {
+            return '/'.$parts[1];
+        }
+    }
+
+
 }

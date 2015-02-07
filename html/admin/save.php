@@ -19,8 +19,13 @@ if(isset($_GET['action'])) {
             if($page->load()) {
 
                 $page->title = trim(htmlspecialchars($_GET['title']));
+                $page->digest = trim(htmlspecialchars($_GET['digest']));
                 $page->updated = date('c');
                 $page->updatedBy = $login->getLoggedInUser();
+
+                if($page->created == null) {
+                    $page->created = $page->updated;
+                }
 
                 $pageData = trim(htmlspecialchars($_GET['pageData']));
                 $page->setPageData($pageData);

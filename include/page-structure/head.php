@@ -60,7 +60,32 @@ if(!is_null($page->title) && mb_strlen($page->title)) {
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Startsiden</a></li>
+                <?php
+                $class = '';
+                if($page->pageKey == 'page:reserved:index') {
+                    $class = 'active';
+                }
+                ?>
+                <li class="<?php echo $class; ?>"><a href="/">Startsiden</a></li>
+                <?php
+                $allPages = $page->getAllPageKeys(0, 3);
+                if(is_array($allPages) && count($allPages)) {
+                    echo '<li class=""><span>Siste sider:</span></li>';
+                    foreach($allPages as $pageKey) {
+                        $individualPage = new \Enkeltinnhold\Page($pageKey);
+                        if($individualPage->load(false)) {
+                            $class = '';
+                            if($individualPage->isActive()) {
+                                $class = 'active';
+                            }
+                            echo '<li class="'.$class.'"><a href="'.$individualPage->getURL().'">'.$individualPage->title.'</a></li>';
+                        }
+                    }
+                }
+                ?>
+
+
+
                 <!--<li><a href="#">Om</a></li>-->
             </ul>
         </div><!--/.nav-collapse -->
