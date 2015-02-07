@@ -30,7 +30,7 @@ echo htmlspecialchars_decode($page->getPageData());
                         if(mb_strlen($digest)) {
                             $digest = '<p class="lead">'.$digest.'</p>';
                         }
-                        echo '<article><a href="'.$individualPage->getURL().'"><h1>'.$individualPage->title.'</h1></a>'.$digest.'</article>';
+                        echo '<article><a href="'.$individualPage->getURL().'"><h1>'.$individualPage->title.'</h1></a>'.$digest.'</article><hr>';
                     }
                 }
                 echo '</section>';
