@@ -15,7 +15,7 @@ class Page extends Base {
     public $created = null;
     public $updated = null;
     public $updatedBy = null;
-
+    protected $otherData = null;
     protected $pageData; // @todo: masse greier - dele opp, legge til element for element i admin.
 
     public function __construct($pageKey = null) {
@@ -25,6 +25,10 @@ class Page extends Base {
 
     public function setPageData($pageData) {
         $this->pageData = $pageData;
+    }
+
+    public function setOtherData($otherData) {
+        $this->otherData = $otherData;
     }
 
     public function save() {
@@ -37,6 +41,8 @@ class Page extends Base {
         $allData['updated'] = $this->updated;
         $allData['updatedBy'] = $this->updatedBy;
         $allData['pageData'] = $this->pageData;
+        $allData['otherData'] = $this->otherData;
+
         $status = $predisClient->hmset($this->getMasterKey().':'.$this->pageKey, $allData);
 
         if(get_class($status) == 'Predis\Response\Status' && $status->getPayLoad() == 'OK') {
@@ -76,6 +82,11 @@ class Page extends Base {
                             $this->pageData = $value;
                         }
                         break;
+                    case 'otherData':
+                        if($all == true) {
+                            $this->otherData = $value;
+                        }
+                        break;
                     default:
                         // Unknown, ignore and log?
                         break;
@@ -107,19 +118,34 @@ class Page extends Base {
             }
         }
 
-        // set is member
-        if($predisClient->sismember($this->getMasterKey().':allpages', $this->pageKey)) {
-            $this->resolved = true;
-            $this->load();
+        if($this->pageKey == $this->pageKeyPrefix.'reserved:index') {
+            // May return zero, check for null
+            if($predisClient->zrank($this->getMasterKey().':reservedpages', $this->pageKey) !== null) {
+                $this->resolved = true;
+                $this->load();
+            } else {
+                $this->pageKey = 'page:reserved:404';
+                $this->load();
+            }
         } else {
-            $this->pageKey = 'page:reserved:404';
-            $this->load();
+            // May return zero, check for null
+            if($predisClient->zrank($this->getMasterKey().':allpages', $this->pageKey) !== null) {
+                $this->resolved = true;
+                $this->load();
+            } else {
+                $this->pageKey = 'page:reserved:404';
+                $this->load();
+            }
         }
         return $this->resolved;
     }
 
     public function getPageData() {
         return $this->pageData; // @todo: masse greier - dele opp, legge til element for element i admin.
+    }
+
+    public function getOtherData() {
+        return $this->otherData; // @todo: masse greier - dele opp, legge til element for element i admin.
     }
 
     public function isResolved() {
@@ -153,36 +179,18 @@ class Page extends Base {
 
     public function getAllPageKeys($offset = 0, $limit = 5) {
 
-        // @todo: order by
-
+        // @todo: order by, fix limit
         $predisClient = $this->getPredisClient();
-        $allPages = array();
-        $pages = $predisClient->smembers($this->getMasterKey().':allpages');
-        if(is_array($pages) && count($pages)) {
-            foreach($pages as $page) {
-                if (stripos($page, 'page:reserved:') === false) {
-                    $allPages[] = $page;
-                }
-            }
-            $allPages = array_slice($allPages, $offset, $limit, true);
-        }
-        return $allPages;
+        return $predisClient->zrevrange($this->getMasterKey().':allpages', $offset, $limit);
 
     }
 
     public function getAllReservedPageKeys($offset = 0, $limit = 10) {
+
+        // @todo: order by, fix limit
+
         $predisClient = $this->getPredisClient();
-        $allPages = array();
-        $pages = $predisClient->smembers($this->getMasterKey().':allpages');
-        if(is_array($pages) && count($pages)) {
-            foreach($pages as $page) {
-                if(stripos($page, 'page:reserved:') === 0) {
-                    $allPages[] = $page;
-                }
-            }
-            $allPages = array_slice($allPages, $offset, $limit, true);
-        }
-        return $allPages;
+        return $predisClient->zrevrange($this->getMasterKey().':reservedpages', $offset, $limit);
     }
 
     public function getURL() {

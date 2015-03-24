@@ -28,6 +28,13 @@ if(isset($_GET['action'])) {
                 $pageData = trim(htmlspecialchars($_GET['pageData']));
                 $page->setPageData($pageData);
 
+                $otherData = array();
+                $otherData['brewed'] = trim(htmlspecialchars($_GET['brewed']));
+                $otherData['tapped'] = trim(htmlspecialchars($_GET['tapped']));
+                $otherData['storage-and-serving'] = trim(htmlspecialchars($_GET['storage-and-serving']));
+                $otherData = json_encode($otherData);
+                $page->setOtherData($otherData);
+
                 if($page->save()) {
                     // Yay
                     echo json_encode(array('status' => 'saved'), true);
@@ -51,7 +58,9 @@ if(isset($_GET['action'])) {
                 } else {
                     $newPageKey = 'page:'.trim($_GET['newPageKey']);
                     $predisClient = $login->getPredisClient();
-                    if($predisClient->sismember($login->getMasterKey().':allpages', $newPageKey)) {
+
+                    //if($predisClient->sismember($login->getMasterKey().':allpages', $newPageKey)) {
+                    if($predisClient->zrank($login->getMasterKey().':allpages', $newPageKey) !== null) {
                         // Page/URL already exists.
                         echo json_encode(array('status' => 'failed', 'message' => 'Adresse/URL er allerede i bruk', 'element' => 'newPageKey'), true);
                     } else {
@@ -60,15 +69,23 @@ if(isset($_GET['action'])) {
                         if(mb_strlen($title) == 0) {
                             echo json_encode(array('status' => 'failed', 'message' => 'Tittel mangler', 'element' => 'title'), true);
                         } else {
-                            $predisClient->sadd($page->getMasterKey().':allpages', array($newPageKey));
+
+                            $predisClient->zadd($page->getMasterKey().':allpages', array($newPageKey => time()));
 
                             $page = new \Enkeltinnhold\Page($newPageKey);
 
                             $page->title = trim(htmlspecialchars($_GET['title']));
                             $page->digest = trim(htmlspecialchars($_GET['digest']));
-                            $page->created = date('c');
-                            $page->updated = date('c');
+                            $page->created = date('c'); // ISO 8601
+                            $page->updated = date('c'); // ISO 8601
                             $page->updatedBy = $login->getLoggedInUser();
+
+                            $otherData = array();
+                            $otherData['brewed'] = trim(htmlspecialchars($_GET['brewed']));
+                            $otherData['tapped'] = trim(htmlspecialchars($_GET['tapped']));
+                            $otherData['storage-and-serving'] = trim(htmlspecialchars($_GET['storage-and-serving']));
+                            $otherData = json_encode($otherData);
+                            $page->setOtherData($otherData);
 
                             $pageData = trim(htmlspecialchars($_GET['pageData']));
                             $page->setPageData($pageData);

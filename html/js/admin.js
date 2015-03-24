@@ -6,6 +6,20 @@ function getRandomId(a){return a?(0|Math.random()*16).toString(16):(""+1e7+-1e3+
 
 
 $(document).ready(function() {
+
+    $('#brewed').datetimepicker({
+        //calendarWeeks: true,
+        locale: 'nb',
+        format: 'L'
+    });
+    $('#tapped').datetimepicker({
+        //calendarWeeks: true,
+        locale: 'nb',
+        format: 'L'
+    });
+
+
+
     $('form.page-edit').submit(function(e) {
         e.preventDefault();
         var form = $(this);

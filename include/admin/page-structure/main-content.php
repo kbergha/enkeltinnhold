@@ -30,7 +30,7 @@ if($login->isLoggedIn() == false) {
 
     $page = new \Enkeltinnhold\Page(); // @todo move to a "page manager" ?
 
-    $allPages = $page->getAllPageKeys(0, 999);
+    $allPages = $page->getAllPageKeys(0, 9999);
     if(is_array($allPages) && count($allPages)) {
         echo '<h2>Alle vanlige sider:</h2>';
         echo '<a href="/admin/index.php?newPage">Lag ny side</a><br><br>';
@@ -132,7 +132,7 @@ if($login->isLoggedIn() == false) {
     } else if(isset($_GET['page']) && is_string($_GET['page'])) {
         $editPageKey = $_GET['page'];
 
-        if($predisClient->sismember($login->getMasterKey().':allpages', $editPageKey)) {
+        if($predisClient->zrank($login->getMasterKey().':allpages', $editPageKey) !== null || $predisClient->zrank($login->getMasterKey().':reservedpages', $editPageKey) !== null) {
             $allPageData = $predisClient->hgetall($page->getMasterKey().':'.$_GET['page']);
 
             $title = '';
@@ -165,6 +165,28 @@ if($login->isLoggedIn() == false) {
                 $pageData = $allPageData['pageData'];
             }
 
+
+            $jsonData = $allPageData['otherData'];
+            $otherData = json_decode($jsonData, true);
+
+            $brewed = '';
+            if(isset($otherData['brewed'])) {
+                $brewed = $otherData['brewed'];
+            }
+
+            $tapped = '';
+            if(isset($otherData['tapped'])) {
+                $tapped = $otherData['tapped'];
+            }
+
+            $storageAndServing = '';
+            if(isset($otherData['storage-and-serving'])) {
+                $storageAndServing = $otherData['storage-and-serving'];
+            }
+
+
+
+
             // @todo: validate and sanitize
 
             $uniqueID = uniqid("page-");
@@ -185,6 +207,23 @@ if($login->isLoggedIn() == false) {
                             <input type="text" class="form-control" name="digest" id="digest" placeholder="Ingress" value="<?php echo $digest; ?>">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="brewed" class="col-sm-2 control-label">Brygget</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="brewed" id="brewed" placeholder="Brygget" value="<?php echo $brewed; ?>">
+                        </div>
+                        <label for="tapped" class="col-sm-1 control-label">Tappet</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="tapped" id="tapped" placeholder="Tappet" value="<?php echo $tapped; ?>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="brewed" class="col-sm-2 control-label">Lagring og servering</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="storage-and-serving" id="storage-and-serving" placeholder="Lagring og servering" value="<?php echo $storageAndServing; ?>">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label for="<?php echo $uniqueID; ?>" class="col-sm-2 control-label">Tekst</label>
                         <div class="col-sm-10">

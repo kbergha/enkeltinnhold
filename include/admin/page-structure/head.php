@@ -7,7 +7,8 @@
     <title><?php echo $siteConfig['name']; ?> - admin</title>
     <meta name="description" content="">
     <!-- Bootstrap -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="/css/vendor/datetimepicker/bootstrap-datetimepicker.min.css" media="screen">
     <link rel="stylesheet" href="/css/vendor/trumbowyg/ui/trumbowyg.min.css" media="screen">
     <link rel="stylesheet" href="/css/main.css" media="screen">
     <link rel="stylesheet" href="/css/admin.css" media="screen">
@@ -34,6 +35,9 @@
     }
     ?>
     <script src="/js/vendor/trumbowyg/trumbowyg.min.js"></script>
+    <script src="/js/vendor/moment/moment-with-locales.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/vendor/datetimepicker/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/admin.js"></script>
 </head>
 <body>

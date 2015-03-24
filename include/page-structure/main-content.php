@@ -11,8 +11,20 @@ echo '<h1>'.$page->title.'</h1>';
 if(mb_strlen($page->digest)) {
     echo '<p class="lead">'.$page->digest.'</p>';
 }
-
 echo htmlspecialchars_decode($page->getPageData());
+
+$otherData = json_decode($page->getOtherData(), true);
+
+if(isset($otherData['brewed']) && mb_strlen($otherData['brewed'])) {
+    echo '<p>Brygget: '.$otherData['brewed'].'</p>';
+}
+if(isset($otherData['tapped']) && mb_strlen($otherData['tapped'])) {
+    echo '<p>Tapped: '.$otherData['tapped'].'</p>';
+}
+if(isset($otherData['storage-and-serving'])  && mb_strlen($otherData['storage-and-serving'])) {
+    echo '<p>Lagring / servering: '.$otherData['storage-and-serving'].'</p>';
+}
+
 ?>
     </article>
     <?php
