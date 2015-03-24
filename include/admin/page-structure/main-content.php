@@ -166,8 +166,11 @@ if($login->isLoggedIn() == false) {
             }
 
 
-            $jsonData = $allPageData['otherData'];
-            $otherData = json_decode($jsonData, true);
+            $otherData = array();
+            if(isset($allPageData['otherData'])) {
+                $jsonData = $allPageData['otherData'];
+                $otherData = json_decode($jsonData, true);
+            }
 
             $brewed = '';
             if(isset($otherData['brewed'])) {
